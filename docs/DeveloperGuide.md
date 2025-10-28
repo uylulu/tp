@@ -128,6 +128,27 @@ The `Model` component,
 * stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
+### Person class
+
+<puml src="diagrams/PersonClassDiagram.puml" width="400" />
+
+The `Person` class represents a child's record and contains both identity fields (child name, parent name, parent phone, parent email, an immutable `AllergyList`, and an internal `uniqueId`) and data fields (address and tags). Two convenient accessors are exposed: `getAllergies()` which returns the `AllergyList` object and `getAllergyList()` which returns a `Set<Allergy>` for consumers that need individual allergy items.
+
+Note about Subjects and Person lifecycle
+
+The application keeps subject enrolments and scores in `Subject` (and its `ScoreDict`) which store references to `Person` objects. To avoid dangling or duplicate entries when a `Person` is edited or deleted, the codebase enforces the following behaviour:
+
+- Edit: When a `Person` is edited via `EditCommand`, the model replaces the old `Person` instance with a new `Person` instance (the edited copy). The app iterates all `Subject`s: for any subject where the original person was enrolled, the subject will read the original person's score (if present), unenroll the old `Person`, enroll the edited `Person`, and set the preserved score on the edited `Person`. If no score was set, a default unset value is used.
+- Delete: When a `Person` is deleted, the app first unenrolls the person from every `Subject` and removes any associated scores, then removes the person from the address book. This prevents dangling references and keeps subject score dictionaries consistent.
+
+Files implementing this behaviour (examples):
+
+* `src/main/java/seedu/address/logic/commands/EditCommand.java` — transfers enrolments and scores from old to edited person.
+* `src/main/java/seedu/address/model/AddressBook.java` — unenrolls persons from subjects when removing.
+* `src/main/java/seedu/address/model/subject/Subject.java` — enrollment and score management.
+* `src/main/java/seedu/address/model/subject/ScoreDict.java` — per-subject score mapping (Person -> Integer).
+* `src/main/java/seedu/address/model/person/AllergyList.java` — allergy list utilities used by `Person`.
+
 <box type="info" seamless>
 
 **Note:** An alternative (arguably, a more OOP) model is given below. It has a `Tag` list in the `AddressBook`, which `Person` references. This allows `AddressBook` to only require one `Tag` object per unique tag, instead of each `Person` needing their own `Tag` objects.<br>

@@ -1,0 +1,56 @@
+@startuml
+title UML Diagram - Person
+
+' Represents the Person (child) record used by the application.
+class Person {
+    .. static ..
+    - idCounter : int
+
+    .. identity fields ..
+    - childName : Name
+    - parentName : Name
+    - parentPhone : Phone
+    - parentEmail : Email
+    - allergies : AllergyList
+    - uniqueId : int
+
+    .. data fields ..
+    - address : Address
+    - tags : Set<Tag>
+
+    --
+    + Person(childName: Name, parentName: Name, parentPhone: Phone,
+             parentEmail: Email, allergies: AllergyList, address: Address, tags: Set<Tag>)
+    + Person(childName: Name, parentName: Name, parentPhone: Phone,
+             parentEmail: Email, allergies: AllergyList, address: Address, tags: Set<Tag>, uniqueId: int)
+
+    + getChildName() : Name
+    + getParentName() : Name
+    + getParentPhone() : Phone
+    + getParentEmail() : Email
+    + getAddress() : Address
+    + getAllergies() : AllergyList
+    + getAllergyList() : Set<Allergy>
+    + getUniqueId() : int
+    + getTags() : Set<Tag>
+
+    + isSamePerson(other: Person) : boolean
+    + equals(obj: Object) : boolean
+    + hashCode() : int
+    + toString() : String
+}
+
+' Associations (uses)
+Person ..> Name : uses
+Person ..> Phone : uses
+Person ..> Email : uses
+Person ..> AllergyList : has
+Person ..> Address : has
+Person ..> Tag : has many
+
+note right of Person
+  - Instances are immutable after construction.
+  - uniqueId is assigned automatically (or preserved via constructor).
+end note
+
+@enduml
