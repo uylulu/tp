@@ -29,6 +29,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
+import seedu.address.model.subject.ScoreDict;
 import seedu.address.model.subject.Subject;
 import seedu.address.model.tag.Tag;
 
@@ -97,7 +98,7 @@ public class EditCommand extends Command {
                     score = subject.getScore(personToEdit);
                 } catch (IllegalStateException e) {
                     // If no score is present, use default unset value -1
-                    score = -1;
+                    score = Subject.getDefaultScore();
                 }
 
                 subject.unenrollPerson(personToEdit);
